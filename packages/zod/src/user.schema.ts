@@ -35,7 +35,11 @@ export const PasswordUpdateSchema = z
       .string()
       .min(8, { message: "password must be atleast 8 chars long" }),
   })
-  .strict();
+  .strict()
+  .refine((data) => data.newPassword === data.newPasswordConfirm, {
+    message: "Passwords do not match",
+    path: ["newPasswordConfirm"],
+  });
 
 export const BaseUserSchema = base;
 

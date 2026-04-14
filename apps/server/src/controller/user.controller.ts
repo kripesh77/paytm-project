@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { UserModel } from "@repo/db/user.model";
+import { UserModel, type IUserDocument } from "@repo/db/user.model";
 import {
   UserSchema,
   LoginSchema,
@@ -13,15 +13,10 @@ import type { StringValue } from "ms";
 import { JWTService } from "../service/JwtService.js";
 import type { Types } from "mongoose";
 
-type Usr = Omit<User, "password" | "passwordConfirm"> & {
-  password?: string;
-  _id: Types.ObjectId;
-};
-
 declare global {
   namespace Express {
     interface Request {
-      user?: Usr;
+      user?: IUserDocument;
     }
   }
 }
@@ -104,8 +99,25 @@ export const updateMe = catchAsync(
 
 export const updatePassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user;
+    if (!user) return;
     const { currentPassword, newPassword, newPasswordConfirm } =
       PasswordUpdateSchema.parse(req.body);
+
+    if (!(await user.correctPassword(currentPassword))) {
+      return next(new ApiError("Password do not match", 400));
+    }
+
+    user.password = newPassword;
+    user.passwordConfirm = newPasswordConfirm;
+    await user.save();
+
+    const token = jwtService.sign(
+      { id: user._id },
+      { expiresIn: process.env.JWT_EXPIRES_IN as StringValue },
+    );
+
+    return res.json({ status: "success", data: { user, token } });
   },
 );
 

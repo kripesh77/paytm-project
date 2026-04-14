@@ -64,6 +64,12 @@ userSchema.pre<IUserDocument>("save", async function () {
   this.passwordConfirm = undefined;
 });
 
+userSchema.pre<IUserDocument>("save", function () {
+  if (!this.isModified("password") || this.isNew) return;
+
+  this.passwordChangedAt = new Date(Date.now() - 1000);
+});
+
 const UserModel = model("User", userSchema);
 
 export { UserModel };
