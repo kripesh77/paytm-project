@@ -1,1 +1,0 @@
-{"root":["./src/app.ts","./src/server.ts","./src/controller/error.controller.ts","./src/controller/user.controller.ts","./src/route/index.ts","./src/route/user.route.ts","./src/service/jwtservice.ts","./src/types/ehttpstatuscode.ts","./src/types/iapierror.ts","./src/utils/apierror.ts","./src/utils/catchasyncerror.ts"],"version":"5.9.3"}
