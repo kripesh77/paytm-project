@@ -1,0 +1,29 @@
+{
+  "name": "@repo/db",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "exports": {
+    "./connect": {
+      "types": "./src/connectToDB.ts",
+      "default": "./dist/connectToDB.js"
+    },
+    "./model/*": {
+      "types": "./src/models/*.ts",
+      "default": "./dist/models/*.js"
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "mongoose": "^9.4.1"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0"
+  }
+}
