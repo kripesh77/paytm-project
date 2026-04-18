@@ -3,6 +3,7 @@ import * as z from "zod";
 const password = z.string().min(8, "Password must be at least 8 chars long");
 
 const baseUser = z.object({
+  email: z.email(),
   username: z.string().min(3, "Username must be at least 3 chars"),
   firstName: z.string().min(3, "First name must be at least 3 chars"),
   lastName: z.string().min(3, "Last name must be at least 3 chars"),
@@ -23,6 +24,7 @@ export const UserSchema = baseUser
 // ✅ Login (clean)
 export const UserLoginSchema = z.object({
   username: z.string(),
+  email: z.email(),
   password,
 });
 

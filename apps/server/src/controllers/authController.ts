@@ -1,10 +1,10 @@
 import UserModel from "@repo/db/model/User";
-import { UserLoginSchema, UserSchema } from "@repo/zod/userSchema";
-import { prettifyError } from "@repo/zod/prettifyError";
+import { UserLoginSchema, UserSchema } from "@repo/zod/user.schema";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
 import { Request, Response, NextFunction } from "express";
 import { signJWT, verifyJWT } from "../utils/signAndVerifyJWT.js";
+import AccountModel from "@repo/db/model/Account";
 
 export const signup = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -12,13 +12,20 @@ export const signup = catchAsync(
     if (!result.success) {
       return next(result.error);
     }
-    const { username, firstName, lastName, password } = result.data;
+    const { email, username, firstName, lastName, password } = result.data;
 
     const user = await UserModel.create({
+      email,
       username,
       firstName,
       lastName,
       password,
+    });
+
+    // Assigning random balance to user's account
+    await AccountModel.create({
+      userId: user._id,
+      balance: (1 + Math.ceil(Math.random() * 10000)) * 100,
     });
 
     const token = await signJWT(user._id.toString());
@@ -68,8 +75,13 @@ export const protect = catchAsync(
     const user = await UserModel.findById(decoded.id);
 
     if (!user) {
-      return next(new AppError("User doesn't exist", 400));
+      return next(new AppError("User doesn't exist", 404));
     }
+
+    if (user.changedPasswordAfter(decoded.iat))
+      return next(
+        new AppError("Password was changed recently. Please re login", 401),
+      );
 
     req.user = user;
 

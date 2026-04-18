@@ -6,9 +6,9 @@
     "dev": "tsc --watch"
   },
   "exports": {
-    "./userSchema": {
-      "types": "./src/user.schema.ts",
-      "default": "./dist/user.schema.js"
+    "./*": {
+      "types": "./src/*.ts",
+      "default": "./dist/*.js"
     },
     "./prettifyError": {
       "types": "./src/prettifyError.ts",
