@@ -19,10 +19,10 @@ export const updateInfo = catchAsync(
     const user = await UserModel.findByIdAndUpdate(
       req.user._id,
       { firstName, lastName },
-      { returnDocument: "after" },
+      { returnDocument: "after", runValidators: true },
     );
 
-    res.json({ user });
+    res.json({ status: "success", data: { user } });
   },
 );
 
@@ -58,7 +58,7 @@ export const changePassword = catchAsync(
 
     if (!result.success) return next(result.error);
 
-    const freshUser = await UserModel.findById(user.id).select("+password");
+    const freshUser = await UserModel.findById(user._id).select("+password");
 
     if (!freshUser) return next(new AppError("user doesn't exist", 404));
 

@@ -16,18 +16,18 @@ const handleDuplicateEntry = (err: any) => {
   const keyValue = err.keyValue as Record<string, any> | undefined;
 
   if (!keyValue) {
-    return new AppError("Duplicate field value", 411);
+    return new AppError("Duplicate field value", 401);
   }
 
   const field = Object.keys(keyValue)[0];
 
   if (!field) {
-    return new AppError("Duplicate field value", 400);
+    return new AppError("Duplicate field value", 401);
   }
 
   const value = keyValue[field];
 
-  return new AppError(`${field}: ${value} already exists`, 400);
+  return new AppError(`${field}: ${value} already exists`, 401);
 };
 
 const handleValidationError = (err: any) => {
@@ -53,7 +53,7 @@ const globalErrorHandler = (
   if (err instanceof ZodError) {
     return res.status(400).json({
       status: "fail",
-      message: err,
+      message: "Validation failed",
       errors: formatZodErrors(err),
     });
   }
@@ -83,7 +83,11 @@ const globalErrorHandler = (
     });
   }
 
-  console.error("ERROR 💥", err);
+  console.error({
+    message: err.message,
+    stack: err.stack,
+    name: err.name,
+  });
 
   return res.status(500).json({
     status: "error",

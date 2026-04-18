@@ -5,6 +5,7 @@ import AppError from "../utils/appError.js";
 import { Request, Response, NextFunction } from "express";
 import { signJWT, verifyJWT } from "../utils/signAndVerifyJWT.js";
 import AccountModel from "@repo/db/model/Account";
+import mongoose from "mongoose";
 
 export const signup = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -14,22 +15,39 @@ export const signup = catchAsync(
     }
     const { email, username, firstName, lastName, password } = result.data;
 
-    const user = await UserModel.create({
-      email,
-      username,
-      firstName,
-      lastName,
-      password,
-    });
+    const session = await mongoose.startSession();
 
-    // Assigning random balance to user's account
-    await AccountModel.create({
-      userId: user._id,
-      balance: (1 + Math.ceil(Math.random() * 10000)) * 100,
-    });
+    try {
+      session.startTransaction();
 
-    const token = await signJWT(user._id.toString());
-    res.json({ status: "success", user, token });
+      const user = new UserModel({
+        email,
+        username,
+        firstName,
+        lastName,
+        password,
+      });
+
+      await user.save({ session });
+
+      const account = new AccountModel({
+        userId: user._id,
+        balance: (1 + Math.ceil(Math.random() * 10000)) * 100,
+      });
+
+      await account.save({ session });
+
+      await session.commitTransaction();
+
+      const token = await signJWT(user._id.toString());
+
+      res.json({ status: "success", user, token });
+    } catch (err) {
+      await session.abortTransaction();
+      next(err);
+    } finally {
+      session.endSession();
+    }
   },
 );
 

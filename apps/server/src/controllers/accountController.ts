@@ -75,11 +75,13 @@ export const transferBalance = catchAsync(
       await AccountModel.updateOne(
         { userId: req.user._id },
         { $inc: { balance: -amount } },
-      ).session(session);
+        { session },
+      );
       await AccountModel.updateOne(
         { userId: to },
         { $inc: { balance: amount } },
-      ).session(session);
+        { session },
+      );
 
       await session.commitTransaction();
       res.json({
