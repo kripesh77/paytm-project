@@ -1,6 +1,26 @@
 import * as z from "zod";
 
-const password = z.string().min(8, "Password must be at least 8 chars long");
+const identifier = z.union(
+  [
+    z.email("Invalid email address"),
+    z.string().regex(/^[a-zA-Z0-9_]{3,20}$/, {
+      message:
+        "Username must be 3–20 characters (letters, numbers, underscores)",
+    }),
+  ],
+  {
+    error: "Enter a valid email or username",
+  },
+);
+
+const password = z
+  .string({ error: "Password is required" })
+  .min(8, "Password must be at least 8 chars long");
+
+export const UserLoginSchema = z.object({
+  identifier,
+  password,
+});
 
 const baseUser = z.object({
   email: z.email(),
@@ -20,13 +40,6 @@ export const UserSchema = baseUser
     message: "Passwords don't match",
     path: ["passwordConfirm"],
   });
-
-// ✅ Login (clean)
-export const UserLoginSchema = z.object({
-  username: z.string(),
-  email: z.email(),
-  password,
-});
 
 // ✅ Update profile
 export const UserUpdateSchema = z

@@ -79,3 +79,19 @@ export const changePassword = catchAsync(
     });
   },
 );
+
+export const getMe = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user;
+
+    if (!user) return next(new AppError("User doesn't exist", 400));
+
+    const freshUser = await UserModel.findById(user._id);
+
+    if (!freshUser) {
+      return next(new AppError("User doesn't exists", 404));
+    }
+
+    res.status(200).json({ status: "success", data: freshUser });
+  },
+);

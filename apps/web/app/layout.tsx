@@ -1,8 +1,8 @@
+import Nav from "@/components/Nav";
 import "@repo/ui/styles.css";
-import "./globals.css";
+import "./global.css";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import { Providers } from "./providers";
 
 const geist = Geist({ subsets: ["latin"] });
 
@@ -18,9 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={geist.className}>
-        <Providers>{children}</Providers>
-      </body>
+      <body className={geist.className}>{children}</body>
     </html>
   );
 }

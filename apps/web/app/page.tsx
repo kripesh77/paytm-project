@@ -1,13 +1,11 @@
-"use client";
-import { signIn, signOut } from "next-auth/react";
+// Server Component
 
-export const Page = () => {
+import Header from "@/components/Header";
+
+export default async function Page() {
   return (
-    <div>
-      <button onClick={() => signIn()}>Signin</button>
-      <button onClick={() => signOut()}>Sign out</button>
+    <div className="h-screen">
+      <Header text="hello" size="lg" />
     </div>
   );
-};
-
-export default Page;
+}

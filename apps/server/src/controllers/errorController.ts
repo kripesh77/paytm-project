@@ -54,7 +54,16 @@ const globalErrorHandler = (
     return res.status(400).json({
       status: "fail",
       message: "Validation failed",
-      errors: formatZodErrors(err),
+      errors: err.issues.reduce<Record<string, string[]>>((acc, issue) => {
+        const field = issue.path.join(".");
+
+        if (!acc[field]) {
+          acc[field] = [];
+        }
+
+        acc[field].push(issue.message);
+        return acc;
+      }, {}),
     });
   }
 

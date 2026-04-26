@@ -58,9 +58,11 @@ export const signin = catchAsync(
       return next(result.error);
     }
 
-    const { username, password } = result.data;
+    const { identifier, password } = result.data;
 
-    const user = await UserModel.findOne({ username }).select("+password");
+    const user = await UserModel.findOne({
+      $or: [{ username: identifier }, { email: identifier }],
+    }).select("+password");
 
     if (!user) {
       return next(new AppError("User doesn't exist", 404));
