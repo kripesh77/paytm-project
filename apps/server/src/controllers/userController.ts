@@ -4,6 +4,7 @@ import { PasswordUpdateSchema, UserUpdateSchema } from "@repo/zod/user.schema";
 import AppError from "../utils/appError.js";
 import UserModel from "@repo/db/model/User";
 import { signJWT } from "../utils/signAndVerifyJWT.js";
+import AccountModel from "@repo/db/model/Account";
 
 export const updateInfo = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -86,12 +87,28 @@ export const getMe = catchAsync(
 
     if (!user) return next(new AppError("User doesn't exist", 400));
 
-    const freshUser = await UserModel.findById(user._id);
+    const userWithBalance = await AccountModel.findOne({
+      user: user._id,
+    }).populate("user");
 
-    if (!freshUser) {
+    if (!userWithBalance) {
       return next(new AppError("User doesn't exists", 404));
     }
 
-    res.status(200).json({ status: "success", data: freshUser });
+    res.status(200).json({ status: "success", data: userWithBalance });
+  },
+);
+
+export const getUserDetail = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+
+    if (!id) return next(new AppError("Id is not provided", 400));
+
+    const user = await UserModel.findById(id);
+
+    if (!user) return next(new AppError("User doesn't exists!", 404));
+
+    res.status(200).json({ status: "success", data: user });
   },
 );

@@ -18,6 +18,11 @@ export interface SignupFormData {
   passwordConfirm: string;
 }
 
+export interface BalanceTransferFormData {
+  to: string;
+  amount: number;
+}
+
 /**
  * Action return types (returned on validation/error)
  */
@@ -33,6 +38,11 @@ export interface SigninActionState {
 export interface SignupActionState {
   error?: AuthActionErrors;
   formData?: SignupFormData;
+}
+
+export interface BalanceTransferActionState {
+  error?: AuthActionErrors;
+  formData?: BalanceTransferFormData;
 }
 
 // Combined error type for unexpected errors

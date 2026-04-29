@@ -31,7 +31,7 @@ export const signup = catchAsync(
       await user.save({ session });
 
       const account = new AccountModel({
-        userId: user._id,
+        user: user._id,
         balance: (1 + Math.ceil(Math.random() * 10000)) * 100,
       });
 

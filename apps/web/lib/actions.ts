@@ -6,7 +6,9 @@ import {
   SigninActionState,
   SignupActionState,
   AuthActionErrors,
+  BalanceTransferActionState,
 } from "./types";
+import { revalidatePath } from "next/cache";
 
 export async function SigninData(
   _: SigninActionState | undefined,
@@ -40,16 +42,20 @@ export async function SigninData(
           identifier: "Something went wrong",
         };
 
+      const cookieStore = await cookies();
+
       if (err.response?.data.message === "Incorrect password") {
         errors = {
           password: "Incorrect password",
         };
+        cookieStore.delete("auth_token");
       }
 
       if (err.response?.data.message === "User doesn't exist") {
         errors = {
           identifier: "User doesn't exist",
         };
+        cookieStore.delete("auth_token");
       }
       return {
         error: errors,
@@ -111,6 +117,53 @@ export async function SignupData(
     }
 
     return { error: { error: "Unexpected error occurred" } };
+  }
+
+  redirect("/dashboard");
+}
+
+export async function sendMoney(
+  _: BalanceTransferActionState | undefined,
+  formData: FormData,
+): Promise<BalanceTransferActionState | undefined> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+  if (!token) {
+    redirect("/signin");
+  }
+
+  const rawData = Object.fromEntries(formData.entries());
+  const amount = rawData.amount as unknown as number;
+  const to = rawData.to as string;
+
+  try {
+    await axios.post(
+      `${process.env.BACKEND_URL!}/api/v1/account/transfer`,
+      { to, amount: amount * 100 },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    revalidatePath("/dashboard");
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      const errors: AuthActionErrors = err.response?.data?.errors || {
+        amount: "Something went wrong",
+      };
+      if (errors.to) {
+        redirect("/dashboard");
+      }
+      return {
+        error: errors,
+        formData: {
+          to,
+          amount: amount,
+        },
+      };
+    }
   }
 
   redirect("/dashboard");
