@@ -29,7 +29,6 @@ export const transferBalance = catchAsync(
     const result = BalanceTransferSchema.safeParse(req.body);
 
     if (!result.success) {
-      console.log(result.error.message);
       return next(result.error);
     }
 

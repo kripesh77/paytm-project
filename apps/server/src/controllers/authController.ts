@@ -41,7 +41,9 @@ export const signup = catchAsync(
 
       const token = await signJWT(user._id.toString());
 
-      res.json({ status: "success", user, token });
+      const { password: _, ...safeUser } = user.toObject();
+
+      res.json({ status: "success", user: safeUser, token });
     } catch (err) {
       await session.abortTransaction();
       next(err);

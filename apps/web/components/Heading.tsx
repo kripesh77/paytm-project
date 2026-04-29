@@ -7,9 +7,9 @@ interface HeaderType {
 }
 
 const sizes = {
-  sm: clsx("text-xl"),
-  md: clsx("text-2xl"),
-  lg: clsx("text-3xl"),
+  sm: clsx("text-2xl"),
+  md: clsx("text-4xl"),
+  lg: clsx("text-6xl"),
 };
 
 const defaultStyles = clsx("font-bold");
