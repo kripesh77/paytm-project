@@ -27,6 +27,7 @@ export const connectToDB = async (URI: string) => {
         bufferCommands: false,
         serverSelectionTimeoutMS: 10000,
         connectTimeoutMS: 10000,
+        family: 4,
       })
       .catch((err) => {
         console.error("Mongoose initial connection error:", err);

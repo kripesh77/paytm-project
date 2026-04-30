@@ -6,21 +6,17 @@ import { connectToDB } from "@repo/db/connect";
 
 const PORT = process.env.PORT || 8000;
 const MONGODB_URI = process.env.MONGODB_URI;
-const SKIP_ENV = process.env.SKIP_ENV_VALIDATION === "true";
 
 const init = async () => {
   try {
-    if (MONGODB_URI) {
-      console.log("Initializing Database Connection");
-      await connectToDB(MONGODB_URI!);
-      console.log("Database connection successful");
-    } else if (!SKIP_ENV) {
-      throw new Error("MONGODB_URI is not set");
-    } else {
-      console.log(
-        "Skipping DB connection; MONGODB_URI not set and SKIP_ENV_VALIDATION is true",
-      );
+    if (!MONGODB_URI) {
+      console.error("MONGODB_URI is not set. Aborting startup to avoid unexpected behavior.");
+      process.exit(1);
     }
+
+    console.log("Initializing Database Connection");
+    await connectToDB(MONGODB_URI!);
+    console.log("Database connection successful");
 
     // On Vercel serverless runtime we should not call app.listen()
     if (!process.env.VERCEL) {
