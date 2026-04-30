@@ -1,11 +1,25 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
+  "globalEnv": [
+    "MONGODB_URI",
+    "NODE_ENV",
+    "JWT_SECRET",
+    "JWT_EXPIRES_IN",
+    "SKIP_ENV_VALIDATION"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "env": [
+        "MONGODB_URI",
+        "NODE_ENV",
+        "JWT_SECRET",
+        "JWT_EXPIRES_IN",
+        "SKIP_ENV_VALIDATION"
+      ]
     },
     "lint": {
       "dependsOn": ["^lint"]
