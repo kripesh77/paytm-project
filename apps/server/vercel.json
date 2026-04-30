@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd ../.. && npx turbo run build --filter=server",
-  "installCommand": "cd ../.. && yarn install",
+  "buildCommand": "cd ../.. && yarn install && npx turbo run build --filter=server",
+  "installCommand": "",
   "framework": "express",
   "outputDirectory": "dist",
   "env": {
