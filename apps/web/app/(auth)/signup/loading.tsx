@@ -1,5 +1,7 @@
 export default function Loading() {
   return (
-    <div className="h-screen flex justify-center items-center">loading...</div>
+    <div className="h-screen w-screen flex items-center justify-center">
+      <div className="loader"></div>
+    </div>
   );
 }

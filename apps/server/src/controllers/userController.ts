@@ -31,20 +31,25 @@ export const getUsers = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const filter = String(req.query["filter"] ?? "");
 
-    const users = await UserModel.find().or([
+    const users = await UserModel.find(
       {
-        firstName: {
-          $regex: `^${filter}`,
-          $options: "i",
-        },
+        $or: [
+          {
+            firstName: {
+              $regex: `^${filter}`,
+              $options: "i",
+            },
+          },
+          {
+            lastName: {
+              $regex: `^${filter}`,
+              $options: "i",
+            },
+          },
+        ],
       },
-      {
-        lastName: {
-          $regex: `^${filter}`,
-          $options: "i",
-        },
-      },
-    ]);
+      { email: 1, username: 1, firstName: 1, lastName: 1 },
+    );
 
     res.json({ users });
   },

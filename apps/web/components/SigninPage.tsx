@@ -40,7 +40,10 @@ export default function SigninPage() {
             placeholder="12345678"
           />
           <div className="mt-4">
-            <Button text="Sign in" isPending={isPending} />
+            <Button
+              text={`${isPending ? "Signing in" : "Sign in"}`}
+              isPending={isPending}
+            />
           </div>
           <BottomWarning
             to="/signup"

@@ -5,7 +5,7 @@ import Header from "@/components/Heading";
 export default async function Page() {
   return (
     <div className="h-screen">
-      <Header text="hello" size="lg" />
+      <Header text="hello" size="md" />
     </div>
   );
 }

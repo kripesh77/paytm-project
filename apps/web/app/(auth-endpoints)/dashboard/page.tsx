@@ -3,7 +3,11 @@ import { Balance } from "@/components/Balance";
 import Header from "@/components/Heading";
 import { Users } from "@/components/Users";
 
-export default function page() {
+export default function page({
+  searchParams,
+}: {
+  searchParams?: Promise<{ query?: string; page?: string }>;
+}) {
   return (
     <div>
       <div>
@@ -11,7 +15,7 @@ export default function page() {
         <main>
           <div className="p-8">
             <Balance />
-            <Users />
+            <Users searchParams={searchParams} />
           </div>
         </main>
       </div>

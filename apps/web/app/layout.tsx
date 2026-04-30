@@ -1,4 +1,3 @@
-import Nav from "@/components/Nav";
 import "@repo/ui/styles.css";
 import "./global.css";
 import type { Metadata } from "next";

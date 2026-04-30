@@ -17,9 +17,6 @@ export default function Nav() {
           <li>
             <Link href="/dashboard">dashboard</Link>
           </li>
-          <li>
-            <Link href="/send-money">send-money</Link>
-          </li>
         </ul>
       </nav>
     </header>
