@@ -1,6 +1,0 @@
-{
-  "buildCommand": "npx turbo run build --filter=server",
-  "installCommand": "yarn install",
-  "framework": "express",
-  "outputDirectory": "apps/server/dist"
-}
