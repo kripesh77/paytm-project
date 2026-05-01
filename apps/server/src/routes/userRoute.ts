@@ -11,7 +11,7 @@ const router = Router();
 
 router.get("/detail/:id", getUserDetail);
 router.get("/me", protect, getMe);
-router.get("/bulk", getUsers);
+router.get("/bulk", protect, getUsers);
 router.post("/update", protect, updateInfo);
 router.post("/change-password", protect, changePassword);
 

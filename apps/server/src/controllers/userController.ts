@@ -3,6 +3,7 @@ import catchAsync from "../utils/catchAsync.js";
 import { PasswordUpdateSchema, UserUpdateSchema } from "@repo/zod/user.schema";
 import AppError from "../utils/appError.js";
 import UserModel from "@repo/db/model/User";
+import { APIFeatures } from "@repo/db/APIFeatures";
 import { signJWT } from "../utils/signAndVerifyJWT.js";
 import AccountModel from "@repo/db/model/Account";
 
@@ -29,29 +30,26 @@ export const updateInfo = catchAsync(
 
 export const getUsers = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const filter = String(req.query["filter"] ?? "");
+    const user = req.user;
+    if (!user) {
+      return next(new AppError("User doesn't exist", 404));
+    }
 
-    const users = await UserModel.find(
-      {
-        $or: [
-          {
-            firstName: {
-              $regex: `^${filter}`,
-              $options: "i",
-            },
-          },
-          {
-            lastName: {
-              $regex: `^${filter}`,
-              $options: "i",
-            },
-          },
-        ],
-      },
-      { email: 1, username: 1, firstName: 1, lastName: 1 },
-    );
+    const features = new APIFeatures(UserModel.find(), req.query)
+      .filtering()
+      .sort()
+      .project()
+      .paginate();
 
-    res.json({ users });
+    features.query = features.query.find({ _id: { $ne: user._id } });
+
+    const users = await features.query;
+
+    res.json({
+      status: "success",
+      pageInfo: features.pageInfo,
+      data: { users },
+    });
   },
 );
 
