@@ -1,46 +1,44 @@
 import mongoose from "mongoose";
 
-type Cache = {
-  conn: typeof mongoose | null;
-  promise: Promise<typeof mongoose> | null;
-};
-
-declare global {
-  var mongooseCache: Cache | undefined;
-}
-
-const cache: Cache = globalThis.mongooseCache ?? {
-  conn: null,
-  promise: null,
-};
+// Module-level cache - persists across warm invocations in serverless
+let cachedConnection: typeof mongoose | null = null;
+let cachedPromise: Promise<typeof mongoose> | null = null;
 
 export const connectToDB = async (URI: string) => {
-  if (cache.conn) return cache.conn;
+  // Return cached connection if available (reuse from warm invocations)
+  if (cachedConnection) {
+    console.log("Reusing cached MongoDB connection");
+    return cachedConnection;
+  }
 
   if (!URI) {
     throw new Error("Missing MONGODB_URI");
   }
 
-  if (!cache.promise) {
-    cache.promise = mongoose
+  // Create connection promise only once, even if called multiple times concurrently
+  if (!cachedPromise) {
+    cachedPromise = mongoose
       .connect(URI, {
         bufferCommands: false,
-        serverSelectionTimeoutMS: 10000,
-        connectTimeoutMS: 10000,
+        serverSelectionTimeoutMS: 5000,
+        connectTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
         family: 4,
+        maxPoolSize: 10,
+        minPoolSize: 0,
+        maxIdleTimeMS: 5000,
       })
       .catch((err) => {
-        console.error("Mongoose initial connection error:", err);
-        // reset promise so subsequent attempts can retry
-        cache.promise = null;
+        console.error("Mongoose connection error:", err);
+        // Reset promise on failure so subsequent attempts can retry
+        cachedPromise = null;
         throw err;
       });
   }
 
   try {
-    cache.conn = await cache.promise;
-    globalThis.mongooseCache = cache;
-    return cache.conn;
+    cachedConnection = await cachedPromise;
+    return cachedConnection;
   } catch (err) {
     console.error("Mongoose connection failed:", err);
     throw err;
