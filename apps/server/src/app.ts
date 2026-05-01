@@ -10,6 +10,9 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/v1", router);
+app.use("/health", (req: Request, res: Response, next: NextFunction) => {
+  return res.status(200).json({ status: "success", message: "ok" });
+});
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   next(new AppError(`can't find ${req.originalUrl}`, 404));
