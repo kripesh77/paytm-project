@@ -1,11 +1,12 @@
-// Server Component
-
-import Header from "@/components/Heading";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
-  return (
-    <div className="h-screen">
-      <Header text="hello" size="md" />
-    </div>
-  );
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token");
+  if (token) {
+    redirect("/dashboard");
+  } else {
+    redirect("/signin");
+  }
 }
